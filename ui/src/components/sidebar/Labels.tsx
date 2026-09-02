@@ -1,6 +1,6 @@
-import React, { useContext, useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import styled from 'styled-components';
-import { Tag, Switch } from '@allenai/varnish';
+import { Tag, Switch } from 'antd';
 
 import { AnnotationStore } from '../../context';
 import { CheckOutlined, CloseOutlined, InfoCircleOutlined } from '@ant-design/icons';

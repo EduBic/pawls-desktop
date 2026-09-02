@@ -1,4 +1,3 @@
-import React from 'react';
 import { SidebarItem, SidebarItemTitle } from './common';
 import { RelationGroup } from '../../context';
 

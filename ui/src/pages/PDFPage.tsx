@@ -3,7 +3,7 @@ import styled, { ThemeContext } from 'styled-components';
 import { useParams } from 'react-router-dom';
 import * as pdfjs from 'pdfjs-dist';
 import { PDFDocumentProxy, PDFDocumentLoadingTask } from 'pdfjs-dist/types/display/api';
-import { Result, Progress, notification } from '@allenai/varnish';
+import { Result, Progress, notification } from 'antd';
 
 import { QuestionCircleOutlined } from '@ant-design/icons';
 

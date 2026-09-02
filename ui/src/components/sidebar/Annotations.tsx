@@ -1,7 +1,6 @@
-import React from 'react';
 import styled from 'styled-components';
 import { SidebarItem, SidebarItemTitle } from './common';
-import { Switch, notification } from '@allenai/varnish';
+import { Switch, notification } from 'antd';
 import { Annotation } from '../../context';
 
 import { CheckOutlined, CloseOutlined, InfoCircleOutlined } from '@ant-design/icons';

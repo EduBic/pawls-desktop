@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Link, Button } from '@allenai/varnish';
+import { Button } from 'antd';
 
 interface HasWidth {
     width: string;
@@ -44,10 +44,11 @@ export const SidebarItemTitle = styled.h5(
 `
 );
 
+
+// a[href] {
+//     ${Link.contrastLinkColorStyles()};
+// }
 export const Contrast = styled.div`
-    a[href] {
-        ${Link.contrastLinkColorStyles()};
-    }
     line-height: 1;
     font-size: 0.85rem;
     white-space: nowrap;

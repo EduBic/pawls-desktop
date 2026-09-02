@@ -1,7 +1,7 @@
 import { useEffect, useContext } from 'react';
 import { AnnotationStore } from '../context';
 import { saveAnnotations } from '../api';
-import { notification } from '@allenai/varnish';
+import { notification } from 'antd';
 
 export const UndoAnnotation = () => {
     const annotationStore = useContext(AnnotationStore);

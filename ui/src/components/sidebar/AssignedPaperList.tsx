@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import { SidebarItem, SidebarItemTitle, Contrast } from './common';
 import { PaperStatus } from '../../api';
-import { Switch, Tag } from '@allenai/varnish';
+import { Switch, Tag } from 'antd';
 
 import {
     FileDoneOutlined,

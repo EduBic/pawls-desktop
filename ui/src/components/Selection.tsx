@@ -1,6 +1,6 @@
 import React, { MouseEvent, useContext, useState, useEffect } from 'react';
 import styled, { ThemeContext } from 'styled-components';
-import { Modal, Select } from '@allenai/varnish';
+import { Modal, Select } from 'antd';
 
 import { Bounds, TokenId, PDFPageInfo, Annotation, AnnotationStore } from '../context';
 import { CloseCircleFilled, EditFilled } from '@ant-design/icons';

@@ -10,7 +10,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { createGlobalStyle } from 'styled-components';
-import { Result, Spin } from '@allenai/varnish';
+import { Result, Spin } from 'antd';
 import { BrowserRouter, Route, Redirect } from 'react-router-dom';
 
 import { PDFPage } from './pages';
