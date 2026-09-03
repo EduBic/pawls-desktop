@@ -83,17 +83,18 @@ pub struct Allocation {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Page {
-    pub index: i32,
-    pub width: f32,
-    pub height: f32,
+    pub index: usize,
+    pub width: f64,
+    pub height: f64,
+    pub tokens: Vec<Token>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Token {
-    pub x: f32,
-    pub y: f32,
-    pub height: f32,
-    pub width: f32,
+    pub x: f64,
+    pub y: f64,
+    pub height: f64,
+    pub width: f64,
     pub text: String,
 }
 

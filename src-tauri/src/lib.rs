@@ -8,6 +8,7 @@ use tauri::ipc::Response;
 use tauri::Manager;
 
 mod model;
+mod preprocess;
 
 #[tauri::command]
 fn get_pdf(sha: String) -> Result<Response, String> {
@@ -26,34 +27,21 @@ fn get_pdf(sha: String) -> Result<Response, String> {
 #[tauri::command]
 async fn get_tokens(sha: String) -> Result<Vec<PageTokens>, String> {
     println!("get_tokens(sha={})", sha);
-    // ...
 
-    Ok(vec![
-        PageTokens {
-            page: Page {
-                index: 0,
-                width: 595f32,
-                height: 842f32,
-            },
-            tokens: vec![],
-        },
-        PageTokens {
-            page: Page {
-                index: 1,
-                width: 595f32,
-                height: 842f32,
-            },
-            tokens: vec![],
-        },
-        PageTokens {
-            page: Page {
-                index: 2,
-                width: 595f32,
-                height: 842f32,
-            },
-            tokens: vec![],
-        },
-    ])
+    // --- DEFAULT SETTINGS ---
+    let output_directory = "allocated_pdfs";
+    // --- END DEFAULT ---
+
+    let path = PathBuf::from(output_directory).join(sha);
+    let result = preprocess::process_pdfplumber(&path).unwrap();
+
+    Ok(result
+        .into_iter()
+        .map(|p| PageTokens {
+            tokens: p.tokens.clone(),
+            page: p,
+        })
+        .collect())
 }
 
 #[tauri::command]
