@@ -2,8 +2,7 @@
 __pycache__
 **/*.pyc
 
-# UI dependencies
-ui/node_modules/
+node_modules/
 
 # UI build output
 ui/build/
