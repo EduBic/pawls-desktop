@@ -1,4 +1,6 @@
-use crate::model::{Allocation, Annotation, Label, PdfAnnotations, RelationGroup};
+use std::path::PathBuf;
+
+use crate::model::{Allocation, Annotation, Label, PaperStatus, PdfAnnotations, RelationGroup};
 use anyhow::Result;
 
 mod model;
@@ -57,8 +59,75 @@ async fn get_annotations(sha: String) -> Result<PdfAnnotations, String> {
 #[tauri::command]
 async fn get_allocated_paper_status() -> Result<Allocation, String> {
     println!("get_allocated_paper_status()");
-    // ...
-    todo!()
+
+    // --- DEFAULT SETTINGS ---
+    let email = "local_user";
+    let output_directory = "output_dir";
+    // --- END DEFAULT ---
+
+    let status_dir = PathBuf::from(&output_directory).join("status");
+    let status_path = status_dir.join(format!("{}.json", email));
+
+    if !status_path.exists() {
+        // User doesn't have allocated papers.
+        // They can see all PDFs but cannot save anything.
+        let papers = all_pdf_shas(&output_directory)
+            .into_iter()
+            .map(|sha| PaperStatus::empty(&sha, &sha))
+            .collect();
+
+        Ok(Allocation {
+            papers,
+            has_allocated_papers: false,
+        })
+    } else {
+        let contents = fs::read_to_string(&status_path)
+            .map_err(|e| format!("Failed to read allocation status: {e}"))?;
+
+        let status_json: std::collections::HashMap<String, PaperStatus> =
+            serde_json::from_str(&contents)
+                .map_err(|e| format!("Failed to parse allocation status: {e}"))?;
+
+        let papers = status_json.into_values().collect();
+
+        Ok(Allocation {
+            papers,
+            has_allocated_papers: true,
+        })
+    }
+}
+
+use std::fs;
+use std::path::Path;
+
+fn all_pdf_shas(output_directory: &str) -> Vec<String> {
+    let mut shas = Vec::new();
+
+    if let Ok(entries) = fs::read_dir(output_directory) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+
+            if path.is_dir() {
+                if let Ok(files) = fs::read_dir(&path) {
+                    for file in files.flatten() {
+                        let file_path = file.path();
+
+                        if file_path.extension().is_some_and(|ext| ext == "pdf") {
+                            if let Some(sha) = Path::new(&file_path)
+                                .parent()
+                                .and_then(|p| p.file_name())
+                                .and_then(|n| n.to_str())
+                            {
+                                shas.push(sha.to_string());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    shas
 }
 
 #[tauri::command]

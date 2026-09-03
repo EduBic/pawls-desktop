@@ -60,7 +60,7 @@ pub struct PaperStatus {
 }
 
 impl PaperStatus {
-    fn empty(sha: &str, name: &str) -> PaperStatus {
+    pub fn empty(sha: &str, name: &str) -> PaperStatus {
         PaperStatus {
             sha: sha.to_string(),
             name: name.to_string(),
