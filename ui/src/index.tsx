@@ -21,6 +21,8 @@ const theme = {
     }
 }
 
+import 'antd/dist/antd.css';
+
 ReactDOM.render(
     <ThemeProvider theme={theme}>
         <BrowserRouter>
