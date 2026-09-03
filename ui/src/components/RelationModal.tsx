@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { Modal, Tag, Transfer } from 'antd';
 import { Annotation, RelationGroup, AnnotationStore } from '../context';
-import { Label } from '../api';
+import { Label } from '../api/tauri_index';
 import { AnnotationSummary } from './AnnotationSummary';
 
 const { CheckableTag } = Tag;

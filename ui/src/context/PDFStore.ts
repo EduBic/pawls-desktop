@@ -1,7 +1,7 @@
 import { createContext } from 'react';
 import { PDFPageProxy, PDFDocumentProxy } from 'pdfjs-dist/types/display/api';
 
-import { Token, Label } from '../api';
+import { Token, Label } from '../api/tauri_index';
 import { TokenId, Annotation } from './AnnotationStore';
 
 export type Optional<T> = T | undefined;

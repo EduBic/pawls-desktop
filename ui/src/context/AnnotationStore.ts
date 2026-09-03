@@ -2,7 +2,7 @@ import { createContext } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Bounds } from './PDFStore';
-import { Label } from '../api';
+import { Label } from '../api/tauri_index';
 
 export interface TokenId {
     pageIndex: number;

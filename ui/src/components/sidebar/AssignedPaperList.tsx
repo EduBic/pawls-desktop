@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import { SidebarItem, SidebarItemTitle, Contrast } from './common';
-import { PaperStatus } from '../../api';
+import { PaperStatus } from '../../api/tauri_index';
 import { Switch, Tag } from 'antd';
 
 import {

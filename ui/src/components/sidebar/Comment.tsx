@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Input } from 'antd';
 
 import { SidebarItem, SidebarItemTitle } from './common';
-import { PaperStatus, setPdfComment } from '../../api';
+import { PaperStatus, setPdfComment } from '../../api/tauri_index';
 
 interface CommentProps {
     sha: string;

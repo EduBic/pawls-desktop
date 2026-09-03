@@ -27,7 +27,7 @@ import {
     Label,
     getAnnotations,
     getRelations,
-} from '../api';
+} from '../api/tauri_index';
 import {
     PDFPageInfo,
     Annotation,

@@ -15,7 +15,7 @@ import { BrowserRouter, Route, Redirect } from 'react-router-dom';
 
 import { PDFPage } from './pages';
 import { CenterOnPage } from './components';
-import { getAllocatedPaperStatus, PaperStatus } from './api';
+import { getAllocatedPaperStatus, PaperStatus } from './api/tauri_index';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 
 const RedirectToFirstPaper = () => {

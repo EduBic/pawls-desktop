@@ -1,6 +1,6 @@
 import { useEffect, useContext } from 'react';
 import { AnnotationStore } from '../context';
-import { saveAnnotations } from '../api';
+import { saveAnnotations } from '../api/tauri_index';
 import { notification } from 'antd';
 
 export const UndoAnnotation = () => {

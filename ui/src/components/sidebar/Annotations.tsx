@@ -5,7 +5,7 @@ import { Annotation } from '../../context';
 
 import { CheckOutlined, CloseOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { AnnotationSummary } from '../AnnotationSummary';
-import { setPdfJunk, setPdfFinished } from '../../api';
+import { setPdfJunk, setPdfFinished } from '../../api/tauri_index';
 
 interface AnnotationsProps {
     sha: string;

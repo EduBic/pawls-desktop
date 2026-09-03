@@ -17,6 +17,7 @@
   ],
   "dependencies": {
     "@ant-design/icons": "^4.2.1",
+    "@tauri-apps/api": "^2.11.1",
     "antd": "^4.24.16",
     "axios": "^0.21.2",
     "pdfjs-dist": "^2.7.570",
@@ -28,7 +29,6 @@
     "uuid": "^8.3.0"
   },
   "resolutions": {
-    "react-scripts/webpack": "^4.41.3",
     "moment": "^2.29.2",
     "minimist": "^1.2.6",
     "url-parse": "^1.5.10",
