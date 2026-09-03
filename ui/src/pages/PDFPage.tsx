@@ -18,7 +18,6 @@ import {
     Comment,
 } from '../components/sidebar';
 import {
-    pdfURL,
     getTokens,
     PageTokens,
     PaperStatus,
@@ -27,6 +26,7 @@ import {
     Label,
     getAnnotations,
     getRelations,
+    getPdf,
 } from '../api/tauri_index';
 import {
     PDFPageInfo,
@@ -138,66 +138,78 @@ export const PDFPage = () => {
     }, [sha]);
 
     useEffect(() => {
-        setDocument(undefined);
-        setViewState(ViewState.LOADING);
-        const loadingTask: PDFDocumentLoadingTask = pdfjs.getDocument(pdfURL(sha));
-        loadingTask.onProgress = (p: { loaded: number; total: number }) => {
-            setProgress(Math.round((p.loaded / p.total) * 100));
-        };
-        Promise.all([
-            // PDF.js uses their own `Promise` type, which according to TypeScript doesn't overlap
-            // with the base `Promise` interface. To resolve this we (unsafely) cast the PDF.js
-            // specific `Promise` back to a generic one. This works, but might have unexpected
-            // side-effects, so we should remain wary of this code.
-            (loadingTask.promise as unknown) as Promise<PDFDocumentProxy>,
-            getTokens(sha),
-        ])
-            .then(([doc, resp]: [PDFDocumentProxy, PageTokens[]]) => {
+        let cancelled = false;
+
+        async function loadPdf() {
+            try {
+                setDocument(undefined);
+                setPages(undefined);
+                setViewState(ViewState.LOADING);
+
+                const [pdfBytes, resp] = await Promise.all([
+                    getPdf(sha),
+                    getTokens(sha),
+                ]);
+
+                if (cancelled) return;
+
+                const loadingTask = pdfjs.getDocument({
+                    data: pdfBytes,
+                });
+
+                loadingTask.onProgress = (p: any) => {
+                    setProgress(
+                        Math.round((p.loaded / p.total) * 100)
+                    );
+                };
+
+                const doc = await loadingTask.promise;
+
+                if (cancelled) return;
+
                 setDocument(doc);
 
-                // Load all the pages too. In theory this makes things a little slower to startup,
-                // as fetching and rendering them asynchronously would make it faster to render the
-                // first, visible page. That said it makes the code simpler, so we're ok with it for
-                // now.
                 const loadPages: Promise<PDFPageInfo>[] = [];
+
                 for (let i = 1; i <= doc.numPages; i++) {
-                    // See line 50 for an explanation of the cast here.
                     loadPages.push(
-                        (doc.getPage(i).then((p) => {
-                            const pageIndex = p.pageNumber - 1;
+                        doc.getPage(i).then((page) => {
+                            const pageIndex = page.pageNumber - 1;
                             const pageTokens = resp[pageIndex].tokens;
-                            return new PDFPageInfo(p, pageTokens);
-                        }) as unknown) as Promise<PDFPageInfo>
+
+                            return new PDFPageInfo(
+                                page,
+                                pageTokens
+                            );
+                        })
                     );
                 }
-                return Promise.all(loadPages);
-            })
-            .then((pages) => {
-                setPages(pages);
-                // Get any existing annotations for this pdf.
-                getAnnotations(sha)
-                    .then((paperAnnotations) => {
-                        setPdfAnnotations(paperAnnotations);
 
-                        setViewState(ViewState.LOADED);
-                    })
-                    .catch((err: any) => {
-                        console.error(`Error Fetching Existing Annotations: `, err);
-                        setViewState(ViewState.ERROR);
-                    });
-            })
-            .catch((err: any) => {
-                if (err instanceof Error) {
-                    // We have to use the message because minification in production obfuscates
-                    // the error name.
-                    if (err.message === 'Request failed with status code 404') {
-                        setViewState(ViewState.NOT_FOUND);
-                        return;
-                    }
-                }
-                console.error(`Error Loading PDF: `, err);
+                const pages = await Promise.all(loadPages);
+
+                if (cancelled) return;
+
+                setPages(pages);
+
+                const annotations = await getAnnotations(sha);
+
+                if (cancelled) return;
+
+                setPdfAnnotations(annotations);
+                setViewState(ViewState.LOADED);
+            } catch (err) {
+                if (cancelled) return;
+
+                console.error('Error loading PDF:', err);
                 setViewState(ViewState.ERROR);
-            });
+            }
+        }
+
+        loadPdf();
+
+        return () => {
+            cancelled = true;
+        };
     }, [sha]);
 
     const sidebarWidth = '300px';

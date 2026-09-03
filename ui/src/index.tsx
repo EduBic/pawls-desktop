@@ -9,10 +9,23 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter, Route } from 'react-router-dom';
 
 import App from './App';
+import { ThemeProvider } from 'styled-components';
+
+const theme = {
+    color: {
+        T6: "dcdcdc",
+        G6: "dcdcdc"
+    },
+    spacing: {
+        md: "16px"
+    }
+}
 
 ReactDOM.render(
-    <BrowserRouter>
-        <Route path="/" component={App} />
-    </BrowserRouter>,
+    <ThemeProvider theme={theme}>
+        <BrowserRouter>
+            <Route path="/" component={App} />
+        </BrowserRouter>
+    </ThemeProvider>,
     document.getElementById('root')
 );

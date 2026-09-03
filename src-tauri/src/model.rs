@@ -80,3 +80,25 @@ pub struct Allocation {
     #[serde(rename = "hasAllocatedPapers")]
     pub has_allocated_papers: bool,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Page {
+    pub index: i32,
+    pub width: f32,
+    pub height: f32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Token {
+    pub x: f32,
+    pub y: f32,
+    pub height: f32,
+    pub width: f32,
+    pub text: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PageTokens {
+    pub page: Page,
+    pub tokens: Vec<Token>,
+}

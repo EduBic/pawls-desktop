@@ -1,30 +1,101 @@
 use std::path::PathBuf;
 
-use crate::model::{Allocation, Annotation, Label, PaperStatus, PdfAnnotations, RelationGroup};
+use crate::model::{
+    Allocation, Annotation, Label, Page, PageTokens, PaperStatus, PdfAnnotations, RelationGroup,
+};
 use anyhow::Result;
+use tauri::ipc::Response;
+use tauri::Manager;
 
 mod model;
 
 #[tauri::command]
-async fn get_tokens(sha: String) -> Result<Vec<String>, String> {
+fn get_pdf(sha: String) -> Result<Response, String> {
+    println!("get_pdf(sha={})", sha);
+
+    // --- DEFAULT SETTINGS ---
+    let output_directory = "allocated_pdfs";
+    // --- END DEFAULT ---
+
+    let path = PathBuf::from(output_directory).join(sha);
+    let data = std::fs::read(&path).map_err(|e| format!("Failed to read PDF: {}", e))?;
+
+    Ok(Response::new(data))
+}
+
+#[tauri::command]
+async fn get_tokens(sha: String) -> Result<Vec<PageTokens>, String> {
     println!("get_tokens(sha={})", sha);
     // ...
 
-    todo!()
+    Ok(vec![
+        PageTokens {
+            page: Page {
+                index: 0,
+                width: 595f32,
+                height: 842f32,
+            },
+            tokens: vec![],
+        },
+        PageTokens {
+            page: Page {
+                index: 1,
+                width: 595f32,
+                height: 842f32,
+            },
+            tokens: vec![],
+        },
+        PageTokens {
+            page: Page {
+                index: 2,
+                width: 595f32,
+                height: 842f32,
+            },
+            tokens: vec![],
+        },
+    ])
 }
 
 #[tauri::command]
 async fn get_labels() -> Result<Vec<Label>, String> {
     println!("get_labels()");
-    // ...
-    todo!()
+
+    // --- DEFAULT SETTINGS ---
+    Ok(vec![
+        Label {
+            text: "Relation Success".into(),
+            color: "#81f38a".into(),
+        },
+        Label {
+            text: "Relation Warning".into(),
+            color: "#ffd986".into(),
+        },
+        Label {
+            text: "Relation Info".into(),
+            color: "#97d2ff".into(),
+        },
+    ])
 }
 
 #[tauri::command]
 async fn get_relations() -> Result<Vec<Label>, String> {
     println!("get_relations()");
-    // ...
-    todo!()
+
+    // --- DEFAULT SETTINGS ---
+    Ok(vec![
+        Label {
+            text: "Success".into(),
+            color: "#81f38a".into(),
+        },
+        Label {
+            text: "Warning".into(),
+            color: "#ffd986".into(),
+        },
+        Label {
+            text: "Info".into(),
+            color: "#97d2ff".into(),
+        },
+    ])
 }
 
 #[tauri::command]
@@ -51,9 +122,11 @@ async fn set_pdf_finished(sha: String, finished: bool) -> Result<(), String> {
 #[tauri::command]
 async fn get_annotations(sha: String) -> Result<PdfAnnotations, String> {
     println!("get_annotations(sha={})", sha);
-    // ...
 
-    todo!()
+    Ok(PdfAnnotations {
+        annotations: vec![],
+        relations: vec![],
+    })
 }
 
 #[tauri::command]
@@ -62,7 +135,7 @@ async fn get_allocated_paper_status() -> Result<Allocation, String> {
 
     // --- DEFAULT SETTINGS ---
     let email = "local_user";
-    let output_directory = "output_dir";
+    let output_directory = "allocated_pdfs";
     // --- END DEFAULT ---
 
     let status_dir = PathBuf::from(&output_directory).join("status");
@@ -98,29 +171,21 @@ async fn get_allocated_paper_status() -> Result<Allocation, String> {
 }
 
 use std::fs;
-use std::path::Path;
 
 fn all_pdf_shas(output_directory: &str) -> Vec<String> {
     let mut shas = Vec::new();
 
+    println!("{}", output_directory);
+
     if let Ok(entries) = fs::read_dir(output_directory) {
         for entry in entries.flatten() {
             let path = entry.path();
+            println!("  - {:?}", path);
 
-            if path.is_dir() {
-                if let Ok(files) = fs::read_dir(&path) {
-                    for file in files.flatten() {
-                        let file_path = file.path();
-
-                        if file_path.extension().is_some_and(|ext| ext == "pdf") {
-                            if let Some(sha) = Path::new(&file_path)
-                                .parent()
-                                .and_then(|p| p.file_name())
-                                .and_then(|n| n.to_str())
-                            {
-                                shas.push(sha.to_string());
-                            }
-                        }
+            if path.is_file() {
+                if path.extension().is_some_and(|ext| ext == "pdf") {
+                    if let Some(sha) = path.file_name() {
+                        shas.push(sha.to_string_lossy().to_string());
                     }
                 }
             }
@@ -152,6 +217,7 @@ async fn save_annotations(
 pub fn run() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
+            get_pdf,
             get_tokens,
             get_labels,
             get_relations,
@@ -163,6 +229,9 @@ pub fn run() {
             get_annotations,
         ])
         .setup(|app| {
+            let window = app.get_webview_window("main").unwrap();
+            window.open_devtools();
+
             if cfg!(debug_assertions) {
                 app.handle().plugin(
                     tauri_plugin_log::Builder::default()

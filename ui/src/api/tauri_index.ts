@@ -43,12 +43,8 @@ export interface Allocation {
 
 // ---------------------------------------------------------------------------
 
-function docURL(sha: string): string {
-    return `/api/doc/${sha}`;
-}
-
-export function pdfURL(sha: string): string {
-    return `${docURL(sha)}/pdf`;
+export function getPdf(sha: string): Promise<Uint8Array> {
+    return invoke<Uint8Array>('get_pdf', { sha });
 }
 
 // ---------------------------------------------------------------------------
@@ -84,8 +80,9 @@ export async function setPdfJunk(sha: string, junk: boolean) {
 }
 
 export async function getAllocatedPaperStatus(): Promise<Allocation> {
-  console.info("getAllocatedPaperStatus");
-  return invoke("get_allocated_paper_status");
+  const paper_statuses = await invoke("get_allocated_paper_status");
+  console.info("getAllocatedPaperStatus", paper_statuses);
+  return paper_statuses as Allocation;
 }
 
 export function saveAnnotations(
